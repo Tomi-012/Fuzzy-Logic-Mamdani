@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/index.py": {
-      "runtime": "vercel-python@0.6.2"
+      "runtime": "@vercel/python@1.3.0"
     }
   },
   "installCommand": "pip install -r requirements.txt",
