@@ -184,7 +184,7 @@ MIT License - lihat file [LICENSE](LICENSE) untuk detail
 
 ## 👥 Tim
 
-- **Developer**: Kilo Code
+- **Developer**: Mas Rori
 - **Methodology**: Fuzzy Logic Mamdani
 - **Data Source**: BPS Indonesia
 - **Year**: 2023

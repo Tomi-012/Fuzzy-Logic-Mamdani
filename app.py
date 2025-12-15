@@ -13,18 +13,37 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Initialize components
-try:
-    csv_file = 'Posisi Kredit Usaha Mikro, Kecil, dan Menengah (UMKM) pada Bank Umum__, 2023.csv'
-    if not os.path.exists(csv_file):
-        raise FileNotFoundError(f"CSV file not found: {csv_file}")
-    
-    data_processor = UMKMDataProcessor(csv_file)
-    fuzzy_logic = UMKMFuzzyLogic()
-    logger.info("Application initialized successfully")
-except Exception as e:
-    logger.error(f"Failed to initialize application: {str(e)}")
-    data_processor = None
-    fuzzy_logic = None
+def initialize_app():
+    global data_processor, fuzzy_logic
+    try:
+        # Try different possible paths for the CSV file
+        csv_paths = [
+            'Posisi Kredit Usaha Mikro, Kecil, dan Menengah (UMKM) pada Bank Umum__, 2023.csv',
+            './Posisi Kredit Usaha Mikro, Kecil, dan Menengah (UMKM) pada Bank Umum__, 2023.csv',
+            os.path.join(os.getcwd(), 'Posisi Kredit Usaha Mikro, Kecil, dan Menengah (UMKM) pada Bank Umum__, 2023.csv')
+        ]
+        
+        csv_file = None
+        for path in csv_paths:
+            if os.path.exists(path):
+                csv_file = path
+                break
+        
+        if not csv_file:
+            raise FileNotFoundError("CSV file not found in any expected location")
+        
+        data_processor = UMKMDataProcessor(csv_file)
+        fuzzy_logic = UMKMFuzzyLogic()
+        logger.info("Application initialized successfully")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to initialize application: {str(e)}")
+        data_processor = None
+        fuzzy_logic = None
+        return False
+
+# Initialize on import
+initialize_app()
 
 @app.route('/')
 def index():
