@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Fuzzy Logic - Evaluasi Kredit UMKM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Flickering Grid Background -->
+    <div class="flickering-grid" id="flickering-grid"></div>
+    
+    <header class="hero">
+        <div class="hero-inner">
+            <div class="nav-bar">
+                <div class="brand">
+                    <span class="brand-mark"></span>
+                    <div>
+                        <div class="brand-name">Sistem Evaluasi Kredit UMKM</div>
+                    </div>
+                </div>
+                <nav class="nav-links">
+                    <a href="#stats">Ringkasan</a>
+                    <a href="#charts">Distribusi</a>
+                    <a href="#evaluation">Evaluasi</a>
+                    <a href="#result-section">Hasil</a>
+                </nav>
+                <a class="nav-cta" href="#evaluation">Evaluasi Sekarang</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="intro">
+            <div class="brand-sub">Fuzzy Logic Mamdani</div>
+            <p class="intro-eyebrow">Analitik Kredit UMKM</p>
+            <h1 class="intro-title">Penilaian Kelayakan berbasis Fuzzy</h1>
+            <p class="intro-subtitle">Visualisasi data kredit, evaluasi pengajuan, dan rekomendasi otomatis menggunakan inferensi Mamdani.</p>
+        </section>
+
+        <main class="main-content">
+            <section id="stats" class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Total Kredit UMKM</h3>
+                        <p class="stat-value" id="total-credit">Loading...</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h3>Jumlah Lapangan Usaha</h3>
+                        <p class="stat-value" id="total-fields">Loading...</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3>Tahun Data</h3>
+                        <p class="stat-value">2023</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="charts" class="charts-section">
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Distribusi Kredit per Lapangan Usaha</h3>
+                        <canvas id="business-fields-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Distribusi per Skala Usaha</h3>
+                        <canvas id="scales-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Distribusi per Jenis Penggunaan</h3>
+                        <canvas id="usage-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="evaluation" class="form-section">
+                <div class="form-container">
+                    <h2>Evaluasi Pengajuan Kredit</h2>
+                    <form id="fuzzy-form" class="fuzzy-form">
+                        <div class="form-group">
+                            <label for="business-field">Lapangan Usaha</label>
+                            <select id="business-field" name="business_field" required>
+                                <option value="">Pilih Lapangan Usaha</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="scale">Skala Usaha</label>
+                            <select id="scale" name="scale" required>
+                                <option value="">Pilih Skala Usaha</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usage-type">Jenis Penggunaan</label>
+                            <select id="usage-type" name="usage_type" required>
+                                <option value="">Pilih Jenis Penggunaan</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <span class="btn-text">Evaluasi Kredit</span>
+                            <div class="btn-loader"></div>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="result-section" class="result-section hidden">
+                <div class="result-container">
+                    <h2>Hasil Evaluasi</h2>
+                    
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <div class="score-value" id="approval-score">0</div>
+                            <div class="score-label">Skor Persetujuan</div>
+                        </div>
+                        <div class="score-category" id="approval-category">
+                            Menunggu Evaluasi
+                        </div>
+                    </div>
+
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <h3>Analisis Input</h3>
+                            <div class="analysis-item">
+                                <span>Lapangan Usaha:</span>
+                                <span id="input-field">-</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span>Skala Usaha:</span>
+                                <span id="input-scale">-</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span>Jenis Penggunaan:</span>
+                                <span id="input-usage">-</span>
+                            </div>
+                        </div>
+
+                        <div class="analysis-card">
+                            <h3>Nilai Fuzzy</h3>
+                            <div class="analysis-item">
+                                <span>Skala (0-100):</span>
+                                <span id="fuzzy-scale">-</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span>Risiko (0-100):</span>
+                                <span id="fuzzy-risk">-</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span>Prioritas (0-100):</span>
+                                <span id="fuzzy-priority">-</span>
+                            </div>
+                        </div>
+
+                        <div class="analysis-card">
+                            <h3>Informasi Kredit</h3>
+                            <div class="analysis-item">
+                                <span>Range Kredit:</span>
+                                <span id="credit-range">-</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span>Kredit Lapangan:</span>
+                                <span id="field-credit">-</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span>Kredit Penggunaan:</span>
+                                <span id="usage-credit">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recommendations-card">
+                        <h3>Rekomendasi</h3>
+                        <ul id="recommendations-list">
+                            <li>Menunggu hasil evaluasi...</li>
+                        </ul>
+                    </div>
+
+                    <div class="visualization-card">
+                        <h3>Visualisasi Logika Fuzzy</h3>
+                        <div class="visualization-container">
+                            <img id="fuzzy-visualization" src="" alt="Fuzzy Logic Visualization" class="hidden">
+                            <div class="visualization-placeholder">
+                                <i class="fas fa-chart-area"></i>
+                                <p>Visualisasi akan muncul setelah evaluasi</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detailed-analysis-card">
+                        <h3>Analisis Detail</h3>
+                        <div class="analysis-tabs">
+                            <button class="tab-btn active" data-tab="input">Input Analysis</button>
+                            <button class="tab-btn" data-tab="output">Output Analysis</button>
+                        </div>
+                        <div class="tab-content">
+                            <div id="input-tab" class="tab-pane active">
+                                <div class="membership-analysis">
+                                    <h4>Derajat Keanggotaan Input</h4>
+                                    <div id="input-membership-details"></div>
+                                </div>
+                            </div>
+                            <div id="output-tab" class="tab-pane">
+                                <div class="membership-analysis">
+                                    <h4>Derajat Keanggotaan Output</h4>
+                                    <div id="output-membership-details"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="new-evaluation" class="secondary-btn">Evaluasi Baru</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>&copy; 2023 Sistem Fuzzy Logic UMKM. Berdasarkan data BPS Indonesia.</p>
+            <div class="footer-links">
+                <a href="#stats">Ringkasan</a>
+                <a href="#charts">Distribusi</a>
+                <a href="#evaluation">Evaluasi</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
